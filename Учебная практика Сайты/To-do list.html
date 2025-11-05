@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Designer To-Do List</title>
+    <style>
+        :root {
+            --primary: #6c5ce7;
+            --secondary: #a29bfe;
+            --success: #00b894;
+            --warning: #fdcb6e;
+            --danger: #e17055;
+            --light: #f7f7f7;
+            --dark: #2d3436;
+            --border-radius: 8px;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f6fa;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px 0;
+            border-bottom: 1px solid #ddd;
+        }
+
+        h1 {
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: var(--dark);
+            opacity: 0.7;
+        }
+
+        .task-form {
+            background: white;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+        }
+
+        textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #5649c4;
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary);
+            color: white;
+        }
+
+        .btn-danger {
+            background-color: var(--danger);
+            color: white;
+        }
+
+        .filters {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 8px 15px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn.active {
+            background-color: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .task-list {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .task-item {
+            padding: 15px 20px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .task-item:last-child {
+            border-bottom: none;
+        }
+
+        .task-item:hover {
+            background-color: #f9f9f9;
+        }
+
+        .task-checkbox {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .task-content {
+            flex: 1;
+        }
+
+        .task-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .task-description {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .task-meta {
+            display: flex;
+            gap: 10px;
+            margin-top: 8px;
+            flex-wrap: wrap;
+        }
+
+        .task-priority, .task-category, .task-due-date {
+            padding: 3px 8px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .priority-high {
+            background-color: #ffebee;
+            color: var(--danger);
+        }
+
+        .priority-medium {
+            background-color: #fff3e0;
+            color: #ff9800;
+        }
+
+        .priority-low {
+            background-color: #e8f5e9;
+            color: var(--success);
+        }
+
+        .task-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .task-actions button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            opacity: 0.7;
+            transition: opacity 0.3s;
+        }
+
+        .task-actions button:hover {
+            opacity: 1;
+        }
+
+        .completed .task-title {
+            text-decoration: line-through;
+            opacity: 0.7;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #666;
+        }
+
+        .empty-state img {
+            max-width: 200px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        @media (max-width: 600px) {
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+            
+            .task-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            .task-actions {
+                align-self: flex-end;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Designer To-Do List</h1>
+            <p class="subtitle">Организуйте свои дизайн-проекты и задачи</p>
+        </header>
+
+        <section class="task-form">
+            <form id="addTaskForm">
+                <div class="form-group">
+                    <label for="taskTitle">Название задачи</label>
+                    <input type="text" id="taskTitle" placeholder="Например: Создать логотип для клиента" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="taskDescription">Описание</label>
+                    <textarea id="taskDescription" placeholder="Детали задачи..."></textarea>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="taskCategory">Категория</label>
+                        <select id="taskCategory">
+                            <option value="ui-design">UI Дизайн</option>
+                            <option value="ux-research">UX Исследование</option>
+                            <option value="branding">Брендинг</option>
+                            <option value="illustration">Иллюстрация</option>
+                            <option value="prototyping">Прототипирование</option>
+                            <option value="other">Другое</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="taskPriority">Приоритет</label>
+                        <select id="taskPriority">
+                            <option value="high">Высокий</option>
+                            <option value="medium" selected>Средний</option>
+                            <option value="low">Низкий</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="taskDueDate">Срок выполнения</label>
+                        <input type="date" id="taskDueDate">
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn btn-primary">Добавить задачу</button>
+            </form>
+        </section>
+
+        <section class="filters">
+            <button class="filter-btn active" data-filter="all">Все задачи</button>
+            <button class="filter-btn" data-filter="active">Активные</button>
+            <button class="filter-btn" data-filter="completed">Завершенные</button>
+            <button class="filter-btn" data-filter="ui-design">UI Дизайн</button>
+            <button class="filter-btn" data-filter="branding">Брендинг</button>
+        </section>
+
+        <section class="task-list" id="taskList">
+            <!-- Задачи будут добавляться сюда -->
+            <div class="empty-state">
+                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%236c5ce7'%3E%3Cpath d='M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10H7v-2h10v2z'/%3E%3C/svg%3E" alt="No tasks">
+                <h3>Нет задач</h3>
+                <p>Добавьте свою первую задачу, используя форму выше</p>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const addTaskForm = document.getElementById('addTaskForm');
+            const taskList = document.getElementById('taskList');
+            const filterButtons = document.querySelectorAll('.filter-btn');
+            
+            let tasks = JSON.parse(localStorage.getItem('designerTasks')) || [];
+            let currentFilter = 'all';
+            
+            // Загрузка задач при запуске
+            renderTasks();
+            
+            // Добавление новой задачи
+            addTaskForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const title = document.getElementById('taskTitle').value;
+                const description = document.getElementById('taskDescription').value;
+                const category = document.getElementById('taskCategory').value;
+                const priority = document.getElementById('taskPriority').value;
+                const dueDate = document.getElementById('taskDueDate').value;
+                
+                const newTask = {
+                    id: Date.now(),
+                    title,
+                    description,
+                    category,
+                    priority,
+                    dueDate,
+                    completed: false,
+                    createdAt: new Date().toISOString()
+                };
+                
+                tasks.push(newTask);
+                saveTasks();
+                renderTasks();
+                addTaskForm.reset();
+            });
+            
+            // Фильтрация задач
+            filterButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Убрать активный класс со всех кнопок
+                    filterButtons.forEach(btn => btn.classList.remove('active'));
+                    // Добавить активный класс к текущей кнопке
+                    this.classList.add('active');
+                    
+                    currentFilter = this.getAttribute('data-filter');
+                    renderTasks();
+                });
+            });
+            
+            // Функция отрисовки задач
+            function renderTasks() {
+                // Очистить список
+                taskList.innerHTML = '';
+                
+                // Фильтрация задач
+                let filteredTasks = tasks;
+                
+                if (currentFilter === 'active') {
+                    filteredTasks = tasks.filter(task => !task.completed);
+                } else if (currentFilter === 'completed') {
+                    filteredTasks = tasks.filter(task => task.completed);
+                } else if (currentFilter !== 'all') {
+                    filteredTasks = tasks.filter(task => task.category === currentFilter);
+                }
+                
+                // Если задач нет, показать пустое состояние
+                if (filteredTasks.length === 0) {
+                    const emptyState = document.createElement('div');
+                    emptyState.className = 'empty-state';
+                    emptyState.innerHTML = `
+                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%236c5ce7'%3E%3Cpath d='M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10H7v-2h10v2z'/%3E%3C/svg%3E" alt="No tasks">
+                        <h3>Нет задач</h3>
+                        <p>${currentFilter === 'all' ? 'Добавьте свою первую задачу' : 'Нет задач по выбранному фильтру'}</p>
+                    `;
+                    taskList.appendChild(emptyState);
+                    return;
+                }
+                
+                // Отображение задач
+                filteredTasks.forEach(task => {
+                    const taskItem = document.createElement('div');
+                    taskItem.className = `task-item ${task.completed ? 'completed' : ''}`;
+                    
+                    // Форматирование даты
+                    let dueDateText = '';
+                    if (task.dueDate) {
+                        const dueDate = new Date(task.dueDate);
+                        dueDateText = dueDate.toLocaleDateString('ru-RU');
+                    }
+                    
+                    // Получение названия категории
+                    const categoryNames = {
+                        'ui-design': 'UI Дизайн',
+                        'ux-research': 'UX Исследование',
+                        'branding': 'Брендинг',
+                        'illustration': 'Иллюстрация',
+                        'prototyping': 'Прототипирование',
+                        'other': 'Другое'
+                    };
+                    
+                    taskItem.innerHTML = `
+                        <input type="checkbox" class="task-checkbox" ${task.completed ? 'checked' : ''} data-id="${task.id}">
+                        <div class="task-content">
+                            <div class="task-title">${task.title}</div>
+                            ${task.description ? `<div class="task-description">${task.description}</div>` : ''}
+                            <div class="task-meta">
+                                <span class="task-priority priority-${task.priority}">${getPriorityText(task.priority)}</span>
+                                <span class="task-category">${categoryNames[task.category]}</span>
+                                ${dueDateText ? `<span class="task-due-date">${dueDateText}</span>` : ''}
+                            </div>
+                        </div>
+                        <div class="task-actions">
+                            <button class="edit-btn" data-id="${task.id}">✏️</button>
+                            <button class="delete-btn" data-id="${task.id}">🗑️</button>
+                        </div>
+                    `;
+                    
+                    taskList.appendChild(taskItem);
+                });
+                
+                // Добавление обработчиков событий
+                document.querySelectorAll('.task-checkbox').forEach(checkbox => {
+                    checkbox.addEventListener('change', function() {
+                        const taskId = parseInt(this.getAttribute('data-id'));
+                        toggleTaskCompletion(taskId);
+                    });
+                });
+                
+                document.querySelectorAll('.delete-btn').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const taskId = parseInt(this.getAttribute('data-id'));
+                        deleteTask(taskId);
+                    });
+                });
+                
+                document.querySelectorAll('.edit-btn').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const taskId = parseInt(this.getAttribute('data-id'));
+                        editTask(taskId);
+                    });
+                });
+            }
+            
+            // Функция переключения статуса задачи
+            function toggleTaskCompletion(taskId) {
+                tasks = tasks.map(task => {
+                    if (task.id === taskId) {
+                        return { ...task, completed: !task.completed };
+                    }
+                    return task;
+                });
+                
+                saveTasks();
+                renderTasks();
+            }
+            
+            // Функция удаления задачи
+            function deleteTask(taskId) {
+                if (confirm('Вы уверены, что хотите удалить эту задачу?')) {
+                    tasks = tasks.filter(task => task.id !== taskId);
+                    saveTasks();
+                    renderTasks();
+                }
+            }
+            
+            // Функция редактирования задачи
+            function editTask(taskId) {
+                const task = tasks.find(t => t.id === taskId);
+                if (!task) return;
+                
+                document.getElementById('taskTitle').value = task.title;
+                document.getElementById('taskDescription').value = task.description;
+                document.getElementById('taskCategory').value = task.category;
+                document.getElementById('taskPriority').value = task.priority;
+                document.getElementById('taskDueDate').value = task.dueDate;
+                
+                // Удаляем задачу из списка, так как мы её редактируем
+                tasks = tasks.filter(t => t.id !== taskId);
+                saveTasks();
+                renderTasks();
+            }
+            
+            // Функция сохранения задач в localStorage
+            function saveTasks() {
+                localStorage.setItem('designerTasks', JSON.stringify(tasks));
+            }
+            
+            // Вспомогательная функция для получения текста приоритета
+            function getPriorityText(priority) {
+                const priorityTexts = {
+                    'high': 'Высокий',
+                    'medium': 'Средний',
+                    'low': 'Низкий'
+                };
+                
+                return priorityTexts[priority] || 'Средний';
+            }
+        });
+    </script>
+</body>
+</html>
